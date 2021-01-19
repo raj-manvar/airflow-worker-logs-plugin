@@ -1,0 +1,48 @@
+{#
+   Template from Airflow version 1.10.10 airflow/www/templates/airflow/ti_log.html.
+   Removed the JS part dealing with auto tailing logs.
+   The file renders static logs passes as template parameters.
+#}
+
+{% extends "airflow/task_instance.html" %}
+{% block title %}Airflow - DAGs{% endblock %}
+
+{% block body %}
+{{ super() }}
+<h4>{{ title }}</h4>
+<ul class="nav nav-pills" role="tablist">
+  {% for log in logs %}
+  <li role="presentation" class="{{ 'active' if loop.last else '' }}">
+    <a href="#{{ loop.index }}" aria-controls="{{ loop.index }}" role="tab" data-toggle="tab">
+      {{ loop.index }}
+    </a>
+  </li>
+  {% endfor %}
+  <li class="active" style="float: right">
+    <a onclick='scrollBottom()'>Jump to end</a>
+  </li>
+  <li class="active" style="float: right">
+    <a onclick='toggleWrap()'>Toggle wrap</a>
+  </li>
+
+</ul>
+<div class="tab-content">
+  {% for log in logs %}
+  <div role="tabpanel" class="tab-pane {{ 'active' if loop.last else '' }}" id="{{ loop.index }}">
+    <pre><code id="try-{{ loop.index }}" class="{{ 'wrap' if wrapped else '' }}">{{ log }}</code></pre>
+  </div>
+  {% endfor %}
+  </div>
+{% endblock %}
+{% block tail %}
+{{ super() }}
+<script>
+    function toggleWrap() {
+      $("pre code").toggleClass("wrap")
+    }
+
+    function scrollBottom() {
+      $("html, body").animate({ scrollTop: $(document).height() }, 30);
+    }
+</script>
+{% endblock %}
